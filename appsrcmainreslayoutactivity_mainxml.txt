@@ -1,0 +1,160 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="QUẢN LÝ TIÊU THỤ ĐIỆN"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên chủ hộ" />
+
+        <EditText
+            android:id="@+id/edtTenChuHo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập tên chủ hộ"
+            android:inputType="textCapWords"
+            android:singleLine="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Khu vực" />
+
+        <RadioGroup
+            android:id="@+id/rgKhuVuc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 1" />
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 2" />
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 3" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số kWh tiêu thụ" />
+
+        <EditText
+            android:id="@+id/edtSoKwh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số kWh"
+            android:inputType="number"
+            android:singleLine="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/btnThem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Thêm mới"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnSua"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sửa"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnThongKe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Thống kê"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DANH SÁCH HỘ TIÊU THỤ ĐIỆN"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#455A64"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chủ hộ"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Khu vực"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Số kWh"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/lvDanhSach"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:divider="#BDBDBD"
+            android:dividerHeight="1dp" />
+
+    </LinearLayout>
+</ScrollView>

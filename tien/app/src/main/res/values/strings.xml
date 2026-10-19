@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">project1</string>
+    <string-array name="phong_ban_array">
+        <item>Kế toán</item>
+        <item>Họ tên</item>
+        <item>Lương cơ bản</item>
+    </string-array>
+    <string-array name="thoi_tiet_array">
+        <item>Nắng nhẹ</item>
+        <item>Mưa</item>
+        <item>Nhiều mây</item>
+    </string-array>
+</resources>

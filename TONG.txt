@@ -1,0 +1,527 @@
+1. Tạo cấu trúc project
+
+Trong Android Studio, bạn tạo các file sau:
+
+MainActivity.java
+
+Xử lý Thêm mới, Sửa, Thống kê và kiểm tra dữ liệu.
+
+activity_main.xml
+
+Giao diện nhập thông tin, các nút và ListView.
+
+item_dien.xml
+
+Giao diện từng dòng danh sách gồm 3 cột.
+
+Lưu ý: thay package com.example.quanlytiethudien; trong Java bằng package thực tế của project bạn.
+
+2. File activity_main.xml
+
+Đường dẫn: app/src/main/res/layout/activity_main.xml
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="QUẢN LÝ TIÊU THỤ ĐIỆN"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên chủ hộ" />
+
+        <EditText
+            android:id="@+id/edtTenChuHo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập tên chủ hộ"
+            android:inputType="textCapWords"
+            android:singleLine="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Khu vực" />
+
+        <RadioGroup
+            android:id="@+id/rgKhuVuc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 1" />
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 2" />
+
+            <RadioButton
+                android:id="@+id/rbKhuVuc3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khu vực 3" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số kWh tiêu thụ" />
+
+        <EditText
+            android:id="@+id/edtSoKwh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập số kWh"
+            android:inputType="number"
+            android:singleLine="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/btnThem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Thêm mới"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnSua"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Sửa"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnThongKe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Thống kê"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DANH SÁCH HỘ TIÊU THỤ ĐIỆN"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:padding="10dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#455A64"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Chủ hộ"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Khu vực"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Số kWh"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/lvDanhSach"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:divider="#BDBDBD"
+            android:dividerHeight="1dp" />
+
+    </LinearLayout>
+</ScrollView>
+3. File item_dien.xml
+
+Đường dẫn: app/src/main/res/layout/item_dien.xml
+
+Mỗi hộ điện sẽ nằm trên một dòng, chia đều thành 3 cột.
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/txtTen"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="#222222"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/txtKhuVuc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="#222222"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/txtKwh"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textColor="#222222"
+        android:textSize="13sp" />
+
+</LinearLayout>
+4. File MainActivity.java
+
+Đây là phần quan trọng nhất. Bạn thay nội dung MainActivity.java bằng code sau.
+
+
+package com.example.quanlytiethudien;
+
+import android.app.AlertDialog;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText edtTenChuHo, edtSoKwh;
+    RadioGroup rgKhuVuc;
+    Button btnThem, btnSua, btnThongKe;
+    ListView lvDanhSach;
+
+    ArrayList<HoDien> dsHoDien;
+    DienAdapter adapter;
+
+    // -1 nghĩa là chưa chọn dòng nào
+    int selectedPosition = -1;
+
+    // Lớp mô tả một hộ tiêu thụ điện
+    static class HoDien {
+        String tenChuHo;
+        int khuVuc;
+        int soKwh;
+
+        HoDien(String tenChuHo, int khuVuc, int soKwh) {
+            this.tenChuHo = tenChuHo;
+            this.khuVuc = khuVuc;
+            this.soKwh = soKwh;
+        }
+    }
+
+    // Adapter hiển thị dữ liệu thành 3 cột
+    class DienAdapter extends ArrayAdapter<HoDien> {
+
+        DienAdapter() {
+            super(MainActivity.this, 0, dsHoDien);
+        }
+
+        @Override
+        public View getView(int position, View convertView,
+                            ViewGroup parent) {
+
+            if (convertView == null) {
+                convertView = LayoutInflater.from(MainActivity.this)
+                        .inflate(R.layout.item_dien, parent, false);
+            }
+
+            HoDien ho = dsHoDien.get(position);
+
+            TextView txtTen = convertView.findViewById(R.id.txtTen);
+            TextView txtKhuVuc =
+                    convertView.findViewById(R.id.txtKhuVuc);
+            TextView txtKwh = convertView.findViewById(R.id.txtKwh);
+
+            txtTen.setText(ho.tenChuHo);
+            txtKhuVuc.setText("Khu vực " + ho.khuVuc);
+            txtKwh.setText(ho.soKwh + " kWh");
+
+            // Tô màu dòng đang được chọn
+            if (position == selectedPosition) {
+                convertView.setBackgroundColor(0xFFE0E0E0);
+            } else {
+                convertView.setBackgroundColor(0xFFFFFFFF);
+            }
+
+            return convertView;
+        }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Ánh xạ giao diện
+        edtTenChuHo = findViewById(R.id.edtTenChuHo);
+        edtSoKwh = findViewById(R.id.edtSoKwh);
+        rgKhuVuc = findViewById(R.id.rgKhuVuc);
+
+        btnThem = findViewById(R.id.btnThem);
+        btnSua = findViewById(R.id.btnSua);
+        btnThongKe = findViewById(R.id.btnThongKe);
+        lvDanhSach = findViewById(R.id.lvDanhSach);
+
+        // Mặc định chọn khu vực 1
+        rgKhuVuc.check(R.id.rbKhuVuc1);
+
+        // Khởi tạo danh sách
+        dsHoDien = new ArrayList<>();
+
+        // Tạo sẵn 3 dữ liệu mẫu
+        dsHoDien.add(new HoDien("Nguyễn Văn An", 1, 125));
+        dsHoDien.add(new HoDien("Trần Thị Lan", 2, 250));
+        dsHoDien.add(new HoDien("Phạm Quang Minh", 3, 300));
+
+        adapter = new DienAdapter();
+        lvDanhSach.setAdapter(adapter);
+
+        // Chọn một dòng để đưa dữ liệu lên form
+        lvDanhSach.setOnItemClickListener((parent, view, position, id) -> {
+            selectedPosition = position;
+
+            HoDien ho = dsHoDien.get(position);
+
+            edtTenChuHo.setText(ho.tenChuHo);
+            edtSoKwh.setText(String.valueOf(ho.soKwh));
+
+            switch (ho.khuVuc) {
+                case 1:
+                    rgKhuVuc.check(R.id.rbKhuVuc1);
+                    break;
+                case 2:
+                    rgKhuVuc.check(R.id.rbKhuVuc2);
+                    break;
+                case 3:
+                    rgKhuVuc.check(R.id.rbKhuVuc3);
+                    break;
+            }
+
+            adapter.notifyDataSetChanged();
+        });
+
+        // Nút thêm mới
+        btnThem.setOnClickListener(v -> themMoi());
+
+        // Nút sửa
+        btnSua.setOnClickListener(v -> suaThongTin());
+
+        // Nút thống kê
+        btnThongKe.setOnClickListener(v -> thongKe());
+    }
+
+    // Lấy và kiểm tra dữ liệu trên form
+    private HoDien layDuLieuForm() {
+
+        String ten = edtTenChuHo.getText().toString().trim();
+        String kwhText = edtSoKwh.getText().toString().trim();
+
+        if (ten.isEmpty()) {
+            edtTenChuHo.setError("Tên chủ hộ không được để trống");
+            edtTenChuHo.requestFocus();
+            return null;
+        }
+
+        if (kwhText.isEmpty()) {
+            edtSoKwh.setError("Vui lòng nhập số kWh");
+            edtSoKwh.requestFocus();
+            return null;
+        }
+
+        int soKwh;
+
+        try {
+            soKwh = Integer.parseInt(kwhText);
+        } catch (NumberFormatException e) {
+            edtSoKwh.setError("Số kWh phải là số nguyên");
+            return null;
+        }
+
+        if (soKwh < 0) {
+            edtSoKwh.setError("Số kWh phải lớn hơn hoặc bằng 0");
+            return null;
+        }
+
+        int idKhuVuc = rgKhuVuc.getCheckedRadioButtonId();
+        int khuVuc;
+
+        if (idKhuVuc == R.id.rbKhuVuc1) {
+            khuVuc = 1;
+        } else if (idKhuVuc == R.id.rbKhuVuc2) {
+            khuVuc = 2;
+        } else if (idKhuVuc == R.id.rbKhuVuc3) {
+            khuVuc = 3;
+        } else {
+            Toast.makeText(this, "Vui lòng chọn khu vực",
+                    Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        return new HoDien(ten, khuVuc, soKwh);
+    }
+
+    // Thêm mới hộ tiêu thụ điện
+    private void themMoi() {
+
+        HoDien ho = layDuLieuForm();
+
+        if (ho == null) {
+            return;
+        }
+
+        dsHoDien.add(ho);
+        adapter.notifyDataSetChanged();
+
+        Toast.makeText(this, "Thêm mới thành công",
+                Toast.LENGTH_SHORT).show();
+
+        lamMoiForm();
+    }
+
+    // Sửa hộ đã chọn
+    private void suaThongTin() {
+
+        if (selectedPosition == -1) {
+            Toast.makeText(this, "Vui lòng chọn hộ cần sửa",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        HoDien hoMoi = layDuLieuForm();
+
+        if (hoMoi == null) {
+            return;
+        }
+
+        dsHoDien.set(selectedPosition, hoMoi);
+        adapter.notifyDataSetChanged();
+
+        Toast.makeText(this, "Cập nhật thành công",
+                Toast.LENGTH_SHORT).show();
+
+        lamMoiForm();
+    }
+
+    // Xóa dữ liệu trên form và bỏ chọn dòng
+    private void lamMoiForm() {
+
+        edtTenChuHo.setText("");
+        edtSoKwh.setText("");
+
+        rgKhuVuc.check(R.id.rbKhuVuc1);
+
+        selectedPosition = -1;
+        adapter.notifyDataSetChanged();
+
+        edtTenChuHo.requestFocus();
+    }
+
+    // Thống kê tổng số hộ và hộ tiêu thụ nhiều nhất
+    private void thongKe() {
+
+        if (dsHoDien.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Thống kê")
+                    .setMessage("Danh sách chưa có hộ tiêu thụ điện.")
+                    .setPositiveButton("Đồng ý", (dialog, which) ->
+                            dialog.dismiss())
+                    .setNegativeButton("Đóng", (dialog, which) ->
+                            finish())
+                    .show();
+            return;
+        }
+
+        int tongHo = dsHoDien.size();
+        int tongKwh = 0;
+        HoDien caoNhat = dsHoDien.get(0);
+
+        for (HoDien ho : dsHoDien) {
+            tongKwh += ho.soKwh;
+
+            if (ho.soKwh > caoNhat.soKwh) {
+                caoNhat = ho;
+            }
+        }
+
+        String noiDung =
+                "Tổng số hộ: " + tongHo + "\n"
+                + "Tổng điện tiêu thụ: " + tongKwh + " kWh\n"
+                + "Hộ tiêu thụ cao nhất: " + caoNhat.tenChuHo + "\n"
+                + "Khu vực: " + caoNhat.khuVuc + "\n"
+                + "Số kWh: " + caoNhat.soKwh + " kWh";
+
+        new AlertDialog.Builder(this)
+                .setTitle("Thống kê tiêu thụ điện")
+                .setMessage(noiDung)
+                .setPositiveButton("Đồng ý", (dialog, which) ->
+                        dialog.dismiss())
+                .setNegativeButton("Đóng", (dialog, which) ->
+                        finish())
+                .show();
+    }
+}
+
+Lưu ý về package: nếu dòng đầu project của bạn đang là package com.hiennd325.ontap1; thì giữ nguyên dòng đó, không dùng tên package ví dụ phía trên.

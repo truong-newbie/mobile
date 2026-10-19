@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">ontap1</string>
+    <string-array name="danhsach">
+        <item>Điện tử</item>
+        <item>Gia dụng</item>
+        <item>Thực phẩm</item>
+    </string-array>
+</resources>
