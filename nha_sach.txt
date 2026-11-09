@@ -1,0 +1,613 @@
+Dưới đây là mã nguồn Android hoàn chỉnh (sử dụng Java) theo đúng kiến trúc tiêu chuẩn cho bài thi KTTX2: Hệ thống đăng ký mượn sách thư viện.
+
+1. model/Book.java (Model class truyền nhận dữ liệu)
+Java
+package com.example.libraryapp;
+
+import java.io.Serializable;
+
+public class Book implements Serializable {
+    private String maSach;
+    private String nhaXB;
+    private String loaiSach; // Ví dụ: "Tham khảo", "SGK" hoặc "Tham khảo, SGK"
+    private String chuDe;    // Ví dụ: "Toán", "Tiếng Việt"
+
+    public Book() {}
+
+    public Book(String maSach, String nhaXB, String loaiSach, String chuDe) {
+        this.maSach = maSach;
+        this.nhaXB = nhaXB;
+        this.loaiSach = loaiSach;
+        this.chuDe = chuDe;
+    }
+
+    public String getMaSach() { return maSach; }
+    public void setMaSach(String maSach) { this.maSach = maSach; }
+
+    public String getNhaXB() { return nhaXB; }
+    public void setNhaXB(String nhaXB) { this.nhaXB = nhaXB; }
+
+    public String getLoaiSach() { return loaiSach; }
+    public void setLoaiSach(String loaiSach) { this.loaiSach = loaiSach; }
+
+    public String getChuDe() { return chuDe; }
+    public void setChuDe(String chuDe) { this.chuDe = chuDe; }
+}
+2. File Giao diện & Option Menu GD1 (MainActivity)
+res/menu/menu_gd1.xml
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_xac_nhan"
+        android:title="Xác nhận" />
+    <item
+        android:id="@+id/menu_xem_ds"
+        android:title="Xem danh sách" />
+    <item
+        android:id="@+id/menu_thoat"
+        android:title="Thoát" />
+</menu>
+res/layout/activity_main.xml
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvSoLanDangKy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Số lần đăng ký: 0"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etMaSach"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Mã sách" />
+
+    <EditText
+        android:id="@+id/etNhaXB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhà xuất bản" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loại sách:"
+        android:layout_marginTop="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <CheckBox
+            android:id="@+id/cbThamKhao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tham khảo" />
+        <CheckBox
+            android:id="@+id/cbSGK"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SGK" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chủ đề:"
+        android:layout_marginTop="10dp" />
+
+    <RadioGroup
+        android:id="@+id/rgChuDe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/rbToan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Toán" />
+        <RadioButton
+            android:id="@+id/rbTiengViet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiếng Việt" />
+    </RadioGroup>
+</LinearLayout>
+MainActivity.java
+Java
+package com.example.libraryapp;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_CODE_GD2 = 100;
+
+    private TextView tvSoLanDangKy;
+    private EditText etMaSach, etNhaXB;
+    private CheckBox cbThamKhao, cbSGK;
+    private RadioGroup rgChuDe;
+    private RadioButton rbToan, rbTiengViet;
+
+    private ArrayList<Book> listBook = new ArrayList<>();
+    private int countDangKy = 0;
+    private int editingIndex = -1; // -1: đang thêm mới, >= 0: đang sửa mục tại index đó
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        initViews();
+    }
+
+    private void initViews() {
+        tvSoLanDangKy = findViewById(R.id.tvSoLanDangKy);
+        etMaSach = findViewById(R.id.etMaSach);
+        etNhaXB = findViewById(R.id.etNhaXB);
+        cbThamKhao = findViewById(R.id.cbThamKhao);
+        cbSGK = findViewById(R.id.cbSGK);
+        rgChuDe = findViewById(R.id.rgChuDe);
+        rbToan = findViewById(R.id.rbToan);
+        rbTiengViet = findViewById(R.id.rbTiengViet);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_gd1, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_xac_nhan) {
+            xuLyXacNhan();
+            return true;
+        } else if (id == R.id.menu_xem_ds) {
+            moManHinhGD2();
+            return true;
+        } else if (id == R.id.menu_thoat) {
+            hienThiDialogThoat();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void xuLyXacNhan() {
+        String ma = etMaSach.getText().toString().trim();
+        String nhaXB = etNhaXB.getText().toString().trim();
+
+        // 1. Kiểm tra rỗng
+        if (TextUtils.isEmpty(ma) || TextUtils.isEmpty(nhaXB)) {
+            Toast.makeText(this, "Mã sách và Nhà XB không được để trống!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 2. Chọn ít nhất 1 loại sách
+        if (!cbThamKhao.isChecked() && !cbSGK.isChecked()) {
+            Toast.makeText(this, "Vui lòng chọn ít nhất 1 Loại sách!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 3. Chọn 1 chủ đề
+        if (rgChuDe.getCheckedRadioButtonId() == -1) {
+            Toast.makeText(this, "Vui lòng chọn 1 Chủ đề!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 4. Kiểm tra trùng mã (chỉ kiểm tra khi thêm mới hoặc khi sửa mã sang mã khác đã tồn tại)
+        if (editingIndex == -1) {
+            for (Book b : listBook) {
+                if (b.getMaSach().equalsIgnoreCase(ma)) {
+                    Toast.makeText(this, "Mã sách đã tồn tại!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        } else {
+            for (int i = 0; i < listBook.size(); i++) {
+                if (i != editingIndex && listBook.get(i).getMaSach().equalsIgnoreCase(ma)) {
+                    Toast.makeText(this, "Mã sách đã tồn tại!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+
+        // Ghép chuỗi Loại sách
+        ArrayList<String> dsLoai = new ArrayList<>();
+        if (cbThamKhao.isChecked()) dsLoai.add("Tham khảo");
+        if (cbSGK.isChecked()) dsLoai.add("SGK");
+        String loaiSachStr = TextUtils.join(", ", dsLoai);
+
+        // Chuỗi Chủ đề
+        String chuDeStr = rbToan.isChecked() ? "Toán" : "Tiếng Việt";
+
+        Book book = new Book(ma, nhaXB, loaiSachStr, chuDeStr);
+
+        if (editingIndex == -1) {
+            // Thêm mới
+            listBook.add(book);
+            countDangKy++;
+            tvSoLanDangKy.setText("Số lần đăng ký: " + countDangKy);
+            Toast.makeText(this, "Thêm mới thành công!", Toast.LENGTH_SHORT).show();
+        } else {
+            // Cập nhật sau khi sửa từ GD2 gửi về
+            listBook.set(editingIndex, book);
+            editingIndex = -1;
+            Toast.makeText(this, "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+        }
+
+        clearForm();
+    }
+
+    private void clearForm() {
+        etMaSach.setText("");
+        etNhaXB.setText("");
+        cbThamKhao.setChecked(false);
+        cbSGK.setChecked(false);
+        rgChuDe.clearCheck();
+    }
+
+    private void moManHinhGD2() {
+        Intent intent = new Intent(MainActivity.this, ListActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("LIST_BOOK", listBook);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, REQUEST_CODE_GD2);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_GD2 && resultCode == RESULT_OK && data != null) {
+            // Nhận danh sách cập nhật từ GD2
+            if (data.hasExtra("UPDATED_LIST")) {
+                listBook = (ArrayList<Book>) data.getSerializableExtra("UPDATED_LIST");
+            }
+
+            // Nếu người dùng chọn Sửa 1 phần tử ở GD2
+            if (data.hasExtra("EDIT_BOOK") && data.hasExtra("EDIT_INDEX")) {
+                Book editBook = (Book) data.getSerializableExtra("EDIT_BOOK");
+                editingIndex = data.getIntExtra("EDIT_INDEX", -1);
+
+                if (editBook != null) {
+                    etMaSach.setText(editBook.getMaSach());
+                    etNhaXB.setText(editBook.getNhaXB());
+
+                    cbThamKhao.setChecked(editBook.getLoaiSach().contains("Tham khảo"));
+                    cbSGK.setChecked(editBook.getLoaiSach().contains("SGK"));
+
+                    if ("Toán".equals(editBook.getChuDe())) {
+                        rbToan.setChecked(true);
+                    } else if ("Tiếng Việt".equals(editBook.getChuDe())) {
+                        rbTiengViet.setChecked(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void hienThiDialogThoat() {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận thoát")
+                .setMessage("Bạn có chắc chắn muốn thoát ứng dụng?")
+                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+}
+3. File Giao diện, Adapter & Option Menu GD2 (ListActivity)
+res/menu/menu_gd2.xml
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_sua"
+        android:title="Sửa" />
+    <item
+        android:id="@+id/menu_xoa"
+        android:title="Xóa" />
+    <item
+        android:id="@+id/menu_thong_ke"
+        android:title="Thống kê" />
+    <item
+        android:id="@+id/menu_thoat"
+        android:title="Thoát" />
+</menu>
+res/layout/item_book.xml (Custom Layout cho từng dòng ListView)
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/tvLine1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvLine2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#555555" />
+</LinearLayout>
+BookAdapter.java
+Java
+package com.example.libraryapp;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+
+public class BookAdapter extends BaseAdapter {
+    private Context context;
+    private ArrayList<Book> list;
+
+    public BookAdapter(Context context, ArrayList<Book> list) {
+        this.context = context;
+        this.list = list;
+    }
+
+    @Override
+    public int getCount() { return list.size(); }
+
+    @Override
+    public Object getItem(int position) { return list.get(position); }
+
+    @Override
+    public long getItemId(int position) { return position; }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_book, parent, false);
+        }
+
+        Book book = list.get(position);
+        TextView tvLine1 = convertView.findViewById(R.id.tvLine1);
+        TextView tvLine2 = convertView.findViewById(R.id.tvLine2);
+
+        // Định dạng Custom Layout theo đề bài: Mã sách | Nhà XB | Loại sách | Chủ đề
+        tvLine1.setText(book.getMaSach() + " | " + book.getNhaXB());
+        tvLine2.setText("Loại: " + book.getLoaiSach() + " | Chủ đề: " + book.getChuDe());
+
+        return convertView;
+    }
+}
+res/layout/activity_list.xml
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ListView
+        android:id="@+id/lvBook"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice" />
+</LinearLayout>
+ListActivity.java
+Java
+package com.example.libraryapp;
+
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+
+public class ListActivity extends AppCompatActivity {
+
+    private ListView lvBook;
+    private ArrayList<Book> listBook = new ArrayList<>();
+    private BookAdapter adapter;
+    private int selectedPosition = -1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_list);
+
+        lvBook = findViewById(R.id.lvBook);
+
+        // Nhận danh sách từ GD1
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            listBook = (ArrayList<Book>) intent.getExtras().getSerializable("LIST_BOOK");
+        }
+        if (listBook == null) listBook = new ArrayList<>();
+
+        adapter = new BookAdapter(this, listBook);
+        lvBook.setAdapter(adapter);
+
+        // Sự kiện chọn dòng
+        lvBook.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedPosition = position;
+                Toast.makeText(ListActivity.this, "Đã chọn dòng: " + (position + 1), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_gd2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_sua) {
+            xuLySua();
+            return true;
+        } else if (id == R.id.menu_xoa) {
+            xuLyXoa();
+            return true;
+        } else if (id == R.id.menu_thong_ke) {
+            xuLyThongKeVaGuiSMS();
+            return true;
+        } else if (id == R.id.menu_thoat) {
+            hienThiDialogThoat();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void xuLySua() {
+        if (selectedPosition == -1) {
+            Toast.makeText(this, "Vui lòng chọn 1 dòng để sửa!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Book bookToEdit = listBook.get(selectedPosition);
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("EDIT_BOOK", bookToEdit);
+        resultIntent.putExtra("EDIT_INDEX", selectedPosition);
+        resultIntent.putExtra("UPDATED_LIST", listBook);
+        setResult(RESULT_OK, resultIntent);
+        finish(); // Quay lại GD1
+    }
+
+    private void xuLyXoa() {
+        if (selectedPosition == -1) {
+            Toast.makeText(this, "Vui lòng chọn 1 dòng để xóa!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        listBook.remove(selectedPosition);
+        adapter.notifyDataSetChanged();
+        Toast.makeText(this, "Xóa thành công!", Toast.LENGTH_SHORT).show();
+
+        // Cập nhật lại Intent kết quả cho GD1
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("UPDATED_LIST", listBook);
+        setResult(RESULT_OK, resultIntent);
+
+        selectedPosition = -1;
+    }
+
+    private void xuLyThongKeVaGuiSMS() {
+        int countThamKhao = 0;
+        int countSGK = 0;
+
+        for (Book b : listBook) {
+            if (b.getLoaiSach().contains("Tham khảo")) countThamKhao++;
+            if (b.getLoaiSach().contains("SGK")) countSGK++;
+        }
+
+        String message = "Báo cáo số lượng loại sách: Tham khảo = " + countThamKhao + ", SGK = " + countSGK;
+
+        // Dùng Implicit Intent mở giao diện SMS gửi báo cáo tới đầu số 222
+        Intent smsIntent = new Intent(Intent.ACTION_SENDTO);
+        smsIntent.setData(Uri.parse("smsto:222"));
+        smsIntent.putExtra("sms_body", message);
+
+        if (smsIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(smsIntent);
+        } else {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void hienThiDialogThoat() {
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận thoát")
+                .setMessage("Bạn có chắc chắn muốn thoát?")
+                .setPositiveButton("Đồng ý", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+}
+4. AndroidManifest.xml (Khai báo Activity)
+XML
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.libraryapp">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Đăng ký mượn sách"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ListActivity" />
+
+    </application>
+
+</manifest>

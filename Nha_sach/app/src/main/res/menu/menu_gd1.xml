@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_xac_nhan"
+        android:title="Xác nhận"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_xem_ds"
+        android:title="Xem danh sách"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_thoat_gd1"
+        android:title="Thoát"
+        app:showAsAction="never" />
+</menu>

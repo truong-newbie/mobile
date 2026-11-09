@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ĐĂNG KÝ MƯỢN SÁCH"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textColor="#1976D2"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Mã sách -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mã sách:"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtMaSach"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập mã sách (VD: MS01)"
+            android:inputType="text"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Nhà xuất bản -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhà xuất bản:"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtNhaXB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nhập nhà xuất bản (VD: Giáo Dục)"
+            android:inputType="text"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Loại sách: 2 CheckBox (Tham khảo, SGK) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loại sách:"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <CheckBox
+                android:id="@+id/cbThamKhao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tham khảo"
+                android:layout_marginEnd="24dp" />
+
+            <CheckBox
+                android:id="@+id/cbSGK"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SGK" />
+        </LinearLayout>
+
+        <!-- Chủ đề: RadioGroup (Toán, Tiếng Việt) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chủ đề:"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/rgChuDe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/rbToan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Toán"
+                android:layout_marginEnd="32dp" />
+
+            <RadioButton
+                android:id="@+id/rbTiengViet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiếng Việt" />
+        </RadioGroup>
+
+        <!-- Số lần đăng ký: TextView đếm -->
+        <TextView
+            android:id="@+id/tvSoLanDangKy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Số lần đăng ký: 0"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#D32F2F"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:padding="12dp"
+            android:background="#EEEEEE" />
+
+    </LinearLayout>
+</ScrollView>

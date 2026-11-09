@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DANH SÁCH PHIẾU MƯỢN"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#1976D2"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Tiêu đề các cột của Custom Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#DDDDDD"
+        android:padding="8dp"
+        android:weightSum="4">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mã sách"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Nhà XB"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Loại sách"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chủ đề"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lvPhieuMuon"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="#CCCCCC"
+        android:dividerHeight="1dp" />
+
+    <TextView
+        android:id="@+id/tvHuongDan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="* Nhấn vào một dòng để chọn, sau đó chọn menu Sửa hoặc Xóa."
+        android:textSize="13sp"
+        android:textColor="#757575"
+        android:gravity="center"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>
