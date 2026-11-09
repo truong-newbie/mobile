@@ -1,0 +1,393 @@
+FIle MainAcTivity
+package com.example.tx2;
+
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
+import androidx.activity.EdgeToEdge;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.tx2.databinding.ActivityMainBinding;
+
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private TextView edtMa,edtNhietDo,edtDoAm;
+    private Button btnThem,btnSua,btnLuu;
+    private Spinner spThoiTiet;
+    private ListView lvThongTin;
+    private ArrayList<weather> weathers;
+    private WeatherAdapter adapter;
+    private int selectedIndex = -1;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        // ánh xạ đến view
+        edtMa = findViewById(R.id.edtMa);
+        edtNhietDo = findViewById(R.id.edtNhietDo);
+        edtDoAm = findViewById(R.id.edtDoAm);
+        spThoiTiet = findViewById(R.id.spThoiTiet);
+        lvThongTin = findViewById(R.id.lvThongTin);
+        btnThem = findViewById(R.id.btnThem);
+        btnSua = findViewById(R.id.btnSua);
+        btnLuu = findViewById(R.id.btnLuu);
+        // khởi tạo adapter với list
+        weathers = new ArrayList<weather>();
+        adapter = new WeatherAdapter(this,weathers);
+        lvThongTin.setAdapter(adapter);
+        btnThem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // lấy dữ liệu từ view gán vào các biến để tí tạo ra đối tượng weather
+                String ma = edtMa.getText().toString().trim();
+                String nhietDo = edtNhietDo.getText().toString().trim();
+                String doAm = edtDoAm.getText().toString().trim();
+                String kieuThoiTiet = spThoiTiet.getSelectedItem().toString();
+                if (ma.isEmpty() || nhietDo.isEmpty() || doAm.isEmpty() || kieuThoiTiet.isEmpty())
+                {
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+                }
+                weather w = new weather(nhietDo,ma,doAm,kieuThoiTiet);
+                weathers.add(w);
+                adapter.notifyDataSetChanged();
+                clearForm();
+                Toast.makeText(MainActivity.this, "Thêm thành công!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // Làm sự kiện chọn đối tượng hiển thị thông tin lên listView
+        lvThongTin.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedIndex = position;
+                weather w = weathers.get(position);
+                edtMa.setText(w.getMa());
+                edtNhietDo.setText(w.getNhietDo());
+                edtDoAm.setText(w.getDoAm());
+                // chọn đúng spinner
+                for (int i = 0;i < spThoiTiet.getCount();i++)
+                {
+                    if (spThoiTiet.getSelectedItem().toString().equals(w.getKieuThoiTiet()))
+                    {
+                        spThoiTiet.setSelection(i);
+                        break;
+                    }
+                }
+            }
+        });
+        // Làm sự kiện sửa theo mã
+        btnSua.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedIndex == -1)
+                {
+                    Toast.makeText(MainActivity.this,"Vui lòng chọn một item " ,Toast.LENGTH_SHORT).show();
+                }
+                // lấy ra dữ liệu cần sửa
+                String ma = edtMa.getText().toString().trim();
+                String nhietDo = edtNhietDo.getText().toString().trim();
+                String doAm = edtDoAm.getText().toString().trim();
+                String kieuThoiTiet = spThoiTiet.getSelectedItem().toString();
+                if (ma.isEmpty() || nhietDo.isEmpty() || doAm.isEmpty() || kieuThoiTiet.isEmpty())
+                {
+                    Toast.makeText(MainActivity.this, "Vui lòng nhập đủ dữ liệu!", Toast.LENGTH_SHORT).show();
+                }
+                weather w = weathers.get(selectedIndex);
+                w.setMa(ma);
+                w.setNhietDo(nhietDo);
+                w.setDoAm(doAm);
+                w.setKieuThoiTiet(kieuThoiTiet);
+                adapter.notifyDataSetChanged();
+                clearForm();
+                selectedIndex = -1;
+                Toast.makeText(MainActivity.this,"Cập nhật thành công !",Toast.LENGTH_SHORT).show();
+            }
+        });
+        // c) Chức năng LƯU vào bộ nhớ tạm - Cache Storage (2 điểm)
+        btnLuu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences prefs = getSharedPreferences("WeatherCache", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("total", weathers.size());
+                for (int i = 0; i < weathers.size(); i++) {
+                    editor.putString("ma_" + i, weathers.get(i).getMa());
+                    editor.putString("nhiet_" + i, weathers.get(i).getNhietDo());
+                    editor.putString("doam_" + i, weathers.get(i).getDoAm());
+                    editor.putString("kieu_" + i, weathers.get(i).getKieuThoiTiet());
+                }
+                editor.apply();
+                Toast.makeText(MainActivity.this, "Đã lưu vào bộ nhớ tạm thành công!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+    public void clearForm()
+    {
+        edtMa.setText("");
+        edtNhietDo.setText("");
+        edtDoAm.setText("");
+        spThoiTiet.setSelection(0);
+    }
+}
+/////////////////////////
+file weatherAdapter
+package com.example.tx2;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
+import java.util.List;
+
+public class WeatherAdapter extends ArrayAdapter<weather> {
+    private Context context;
+    private List<weather> weathers;
+
+    public WeatherAdapter( Context context, List<weather> weathers) {
+        super(context, R.layout.item,weathers);
+        this.context = context;
+        this.weathers = weathers;
+    }
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
+        if(convertView == null)
+        {
+            convertView = LayoutInflater.from(context).inflate(R.layout.item,parent,false);
+        }
+        // ánh xạ đến view
+        TextView txtMa  = convertView.findViewById(R.id.txtMa);
+        TextView txtNhietDo = convertView.findViewById(R.id.txtNhietDo);
+        TextView txtDoAm = convertView.findViewById(R.id.txtDoAm);
+        TextView txtKieuThoiTiet = convertView.findViewById(R.id.txtKieuThoiTiet);
+        ImageView imgIcon = convertView.findViewById(R.id.imgIcon);
+        // lấy dữ liệu phần tử hiện tại
+        weather w = weathers.get(position);
+        // đưa dữ liệu lên view
+        txtMa.setText(w.getMa());
+        txtNhietDo.setText(w.getNhietDo());
+        txtDoAm.setText(w.getDoAm());
+        txtKieuThoiTiet.setText(w.getKieuThoiTiet());
+        if(txtKieuThoiTiet.getText().equals("Mưa"))
+        {
+            imgIcon.setImageResource(R.drawable.ic_launcher_foreground);
+        }else if (txtKieuThoiTiet.getText().equals("Nắng"))
+        {
+            imgIcon.setImageResource(R.drawable.ic_launcher_background);
+        }else if (txtKieuThoiTiet.getText().equals("Nhiều mây"))
+        {
+            imgIcon.setImageResource(R.drawable.ic_launcher_background);
+        }
+        return convertView;
+    }
+}
+///////////////////////////////////
+file weather
+package com.example.tx2;
+
+public class weather {
+    private String ma,nhietDo,doAm,kieuThoiTiet;
+
+    public weather(String nhietDo, String ma, String doAm, String kieuThoiTiet) {
+        this.nhietDo = nhietDo;
+        this.ma = ma;
+        this.doAm = doAm;
+        this.kieuThoiTiet = kieuThoiTiet;
+    }
+
+    public weather() {
+    }
+
+    public String getMa() {
+        return ma;
+    }
+
+    public void setMa(String ma) {
+        this.ma = ma;
+    }
+
+    public String getNhietDo() {
+        return nhietDo;
+    }
+
+    public void setNhietDo(String nhietDo) {
+        this.nhietDo = nhietDo;
+    }
+
+    public String getDoAm() {
+        return doAm;
+    }
+
+    public void setDoAm(String doAm) {
+        this.doAm = doAm;
+    }
+
+    public String getKieuThoiTiet() {
+        return kieuThoiTiet;
+    }
+
+    public void setKieuThoiTiet(String kieuThoiTiet) {
+        this.kieuThoiTiet = kieuThoiTiet;
+    }
+}
+///////////////////////////
+phần đọc dữ liệu từ cache
+// 1. Mở file bộ nhớ tạm "WeatherCache" ra ở chế độ đọc (MODE_PRIVATE)
+SharedPreferences prefs = getSharedPreferences("WeatherCache", MODE_PRIVATE);
+
+// 2. Đọc tổng số lượng mục đã lưu trước đó (nếu chưa có thì mặc định trả về 0)
+int total = prefs.getInt("total", 0);
+
+// 3. Xóa danh sách hiện tại đi để chuẩn bị nạp dữ liệu cũ vào
+weatherList.clear();
+
+// 4. Dùng vòng lặp để đọc từng mục dựa vào chỉ số i
+for (int i = 0; i < total; i++) {
+    // Đọc lại các thông tin đã lưu tương ứng với từng nhãn (key)
+    String ma = prefs.getString("ma_" + i, "");
+    String nhietDo = prefs.getString("nhiet_" + i, "");
+    String doAm = prefs.getString("doam_" + i, "");
+    String kieu = prefs.getString("kieu_" + i, "");
+
+    // Tạo lại đối tượng WeatherModel từ dữ liệu vừa đọc
+    WeatherModel weather = new WeatherModel(ma, nhietDo, doAm, kieu);
+    
+    // Thêm vào danh sách hiển thị
+    weatherList.add(weather);
+}
+
+// 5. Báo cho Adapter biết là dữ liệu đã thay đổi để nó vẽ lại giao diện ListView
+adapter.notifyDataSetChanged();
+///////////////// tạo intent gửi dữ liệu quan intent
+// 1. Khởi tạo Intent chuyển từ MainActivity sang DetailActivity
+Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+
+// 2. Đính kèm dữ liệu vào Intent (dạng cặp Khóa - Giá trị / Key - Value)
+intent.putExtra("KEY_TITLE", "Báo cáo thời tiết");
+intent.putExtra("KEY_TEMPERATURE", 28); // Kiểu số nguyên (int)
+intent.putExtra("KEY_IS_SUNNY", true);  // Kiểu boolean
+
+// 3. Kích hoạt Activity đích
+startActivity(intent);
+///////////////// nhận dữ liệu qua intent
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_detail);
+
+    // 1. Nhận Intent đã gửi dữ liệu sang
+    Intent intent = getIntent();
+
+    // 2. Lấy dữ liệu ra bằng Key tương ứng
+    String title = intent.getStringExtra("KEY_TITLE");
+    int temperature = intent.getIntExtra("KEY_TEMPERATURE", 0); // 0 là giá trị mặc định nếu không tìm thấy
+    boolean isSunny = intent.getBooleanExtra("KEY_IS_SUNNY", false);
+
+    // 3. Đưa dữ liệu lên giao diện (ví dụ gán vào TextView)
+    TextView tvTitle = findViewById(R.id.tvTitle);
+    TextView tvTemp = findViewById(R.id.tvTemp);
+
+    tvTitle.setText(title);
+    tvTemp.setText("Nhiệt độ: " + temperature + "°C");
+}
+///////////////// phần menu 
+
+1. Option Menu (Menu tùy chọn)Option Menu thường nằm ở góc trên bên phải của ứng dụng (nút 3 chấm hoặc trên thanh Toolbar/ActionBar), dùng cho các chức năng chung của màn hình như Cài đặt, Tìm kiếm, Giới thiệu,...Bước 1: Tạo file XML cho MenuTạo một thư mục mới tên là menu trong thư mục res (nếu chưa có), sau đó tạo file XML tên là option_menu.xml:XML<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <item
+        android:id="@+id/menu_search"
+        android:title="Tìm kiếm"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_settings"
+        android:title="Cài đặt"
+        app:showAsAction="never" />
+</menu>
+Bước 2: Viết code trong MainActivity.javaNạp menu lên giao diện:
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+    // Nạp file option_menu.xml vào Activity
+    getMenuInflater().inflate(R.menu.option_menu, menu);
+    return true;
+}
+Bắt sự kiện khi người dùng bấm vào các mục trong Menu:
+@Override
+public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    int id = item.getItemId();
+    if (id == R.id.menu_search) {
+        Toast.makeText(this, "Bạn chọn Tìm kiếm", Toast.LENGTH_SHORT).show();
+        return true;
+    } else if (id == R.id.menu_settings) {
+        Toast.makeText(this, "Bạn chọn Cài đặt", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+}
+2. Context Menu (Menu ngữ cảnh / Menu nhấn giữ)Context Menu xuất hiện khi người dùng nhấn giữ (long click) vào một thành phần giao diện cụ thể (ví dụ: nhấn giữ vào một dòng trong ListView hoặc một Button) giống như tính năng chuột phải trên máy tính.Bước 1: Tạo file XML cho Context MenuTạo file XML tên là context_menu.xml trong thư mục res/menu/:XML<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_edit"
+        android:title="Sửa" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="Xóa" />
+</menu>
+Bước 2: Viết code trong MainActivity.javaĐăng ký Context Menu cho một View (Ví dụ: cho một chiếc Button hoặc ListView):
+Bên trong hàm onCreate(), bạn phải gọi hàm registerForContextMenu:JavaButton btnClickMe = findViewById(R.id.btnClickMe);
+// Đăng ký Context Menu cho Button này
+registerForContextMenu(btnClickMe);
+Hiển thị Context Menu khi nhấn giữ:
+@Override
+public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    super.onCreateContextMenu(menu, v, menuInfo);
+    // Nạp file context_menu.xml
+    getMenuInflater().inflate(R.menu.context_menu, menu);
+    menu.setHeaderTitle("Chọn hành động"); // Tiêu đề của bảng menu hiện lên
+}
+Bắt sự kiện khi người dùng chọn mục trong Context Menu:
+@Override
+public boolean onContextItemSelected(@NonNull MenuItem item) {
+    int id = item.getItemId();
+    if (id == R.id.menu_edit) {
+        Toast.makeText(this, "Đã chọn Sửa", Toast.LENGTH_SHORT).show();
+        return true;
+    } else if (id == R.id.menu_delete) {
+        Toast.makeText(this, "Đã chọn Xóa", Toast.LENGTH_SHORT).show();
+        return true;
+    }
+    return super.onContextItemSelected(item);
+}
+Tóm tắt điểm khác biệt chính:Option Menu: Bấm vào nút 3 chấm ở góc trên màn hình $\rightarrow$ Gọi hàm onCreateOptionsMenu().Context Menu: Nhấn giữ vào một thành phần cụ thể trên màn hình $\rightarrow$ Phải đăng ký bằng registerForContextMenu() và gọi hàm onCreateContextMenu()
